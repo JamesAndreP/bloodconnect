@@ -1,0 +1,101 @@
+<?php
+
+namespace Tests\Feature;
+
+use Tests\TestCase;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+
+class DonationApprovalTest extends TestCase
+{
+    use RefreshDatabase;
+
+    /** @test */
+    public function hospital_can_approve_donation_request()
+    {
+        // Create hospital user and login
+        $hospitalUser = User::factory()->create([
+            'role' => 'hospital',
+        ]);
+
+        $this->actingAs($hospitalUser);
+
+        // Create donor
+        $donor = User::factory()->create([
+            'role' => 'donor',
+        ]);
+
+        // Create hospital record
+        $hospitalId = DB::table('hospitals')->insertGetId([
+            'user_id' => $hospitalUser->id,
+            'name' => 'Test Hospital',
+            'location' => 'Mandaue City',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Create donation request
+        $requestId = DB::table('donation_requests')->insertGetId([
+            'user_id' => $donor->id,
+            'hospital_id' => $hospitalId,
+            'notes' => 'Initial request',
+            'status' => 'Pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Create old schedule
+        DB::table('donation_request_schedules')->insert([
+            'donation_request_id' => $requestId,
+            'date' => now()->addDays(1)->toDateString(),
+            'notes' => 'Old schedule',
+            'status' => 'Active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Approve request
+        $approvedDate = now()->addDays(7)->toDateString();
+
+        $response = $this->patch("/donation-requests/approve/{$requestId}", [
+            'date' => $approvedDate,
+            'notes' => 'Approved by hospital',
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertSessionHas('success');
+
+        // Check donation request approved
+        $this->assertDatabaseHas('donation_requests', [
+            'id' => $requestId,
+            'status' => 'Approved',
+        ]);
+
+        // Old schedule should become inactive
+        $this->assertDatabaseHas('donation_request_schedules', [
+            'donation_request_id' => $requestId,
+            'notes' => 'Old schedule',
+            'status' => 'Inactive',
+        ]);
+
+        // New schedule created
+        $this->assertDatabaseHas('donation_request_schedules', [
+            'donation_request_id' => $requestId,
+            'date' => $approvedDate,
+            'notes' => 'Approved by hospital',
+            'status' => 'Active',
+        ]);
+    }
+
+    /** @test */
+    public function guest_cannot_approve_donation_request()
+    {
+        $response = $this->patch('/donation-requests/approve/1', [
+            'date' => now()->addDays(7)->toDateString(),
+            'notes' => 'Trying without login',
+        ]);
+
+        $response->assertRedirect('/login');
+    }
+}
