@@ -170,34 +170,44 @@
                             </div>
                         </div>
                     </div>
-                  @if(auth()->user()->role->value == 'donor')
-<div class="row">
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="user.birthdate" class="form-control-label">{{ __('Birthdate') }}</label>
-            <div class="@error('user.Birthdate') border border-danger rounded-3 @enderror">
-                <input class="form-control" type="date" placeholder="Birth Date" id="name" name="birth_date" value="{{ auth()->user()->birth_date }}" readonly>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="user.gender" class="form-control-label">{{ __('Gender') }}</label>
-            <div class="@error('user.gender')border border-danger rounded-3 @enderror">
-                <select class="form-control" name="gender" id="gender" aria-label="gender" aria-describedby="gender" disabled>
-                    <option value="">-- Select Gender --</option>
-                    <option value="Male" {{ auth()->user()->gender == 'Male' ? 'selected' : '' }}>Male</option>
-                    <option value="Female" {{ auth()->user()->gender == 'Female' ? 'selected' : '' }}>Female</option>
-                    <option value="Other" {{ auth()->user()->gender == 'Other' ? 'selected' : '' }}>Other</option>
-                </select>
-                @error('gender')
-                    <p class="text-danger text-xs mt-2">{{ $message }}</p>
-                @enderror
-            </div>
-        </div>
-    </div>
-</div>
-@endif
+                    @if(auth()->user()->role->value == 'donor')
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="user.birthdate" class="form-control-label">{{ __('Birthdate') }}</label>
+                                <div class="@error('user.Birthdate') border border-danger rounded-3 @enderror">
+                                    <input class="form-control" type="date" placeholder="Birth Date" id="name" name="birth_date" value="{{ auth()->user()->birth_date }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="user.gender" class="form-control-label">{{ __('Gender') }}</label>
+                                <div class="@error('user.gender')border border-danger rounded-3 @enderror">
+                                    <select class="form-control" name="gender" id="gender" aria-label="gender" aria-describedby="gender" disabled>
+                                        <option value="">-- Select Gender --</option>
+                                        <option value="Male" {{ auth()->user()->gender == 'Male' ? 'selected' : '' }}>Male</option>
+                                        <option value="Female" {{ auth()->user()->gender == 'Female' ? 'selected' : '' }}>Female</option>
+                                        <option value="Other" {{ auth()->user()->gender == 'Other' ? 'selected' : '' }}>Other</option>
+                                    </select>
+                                    @error('gender')
+                                        <p class="text-danger text-xs mt-2">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="user.blood_type" class="form-control-label">{{ __('Blood Type') }}</label>
+                                <div class="@error('user.blood_type') border border-danger rounded-3 @enderror">
+                                    <input class="form-control" type="text" placeholder="Blood Type" id="name" name="blood_type" value="{{ auth()->user()->blood_type }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                     {{-- <div class="form-group">
                         <label for="about">{{ 'About Me' }}</label>
                         <div class="@error('user.about')border border-danger rounded-3 @enderror">

@@ -51,31 +51,26 @@
         <div class="row">
             <div class="col-12">
                 <div class="card mb-4 mx-4">
-                    {{-- new blood request modal --}}
-                    <x-create-blood-request />
-                    {{-- fulfill blood request modal --}}
-                    <x-fulfill-blood-request />
+                    {{-- add inventory modal --}}
+                    <x-add-inventory />
+                    {{-- deduct inventory modal --}}
+                    <x-deduct-inventory />
                     <div class="card-header pb-0">
                         <div class="d-flex flex-row justify-content-between align-items-center">
     <div>
-        <h5 class="mb-0">Blood Requests</h5>
+        <h5 class="mb-0">Blood Inventory</h5>
     </div>
 
     <div class="d-flex gap-2">
-        <!-- SORT DROPDOWN -->
-        <form method="GET" action="{{ url('/blood-requests') }}">
-            <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
-                <option value="">Sort</option>
-                <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest to Oldest</option>
-                <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest to Newest</option>
-            </select>
-        </form>
-
-        <!-- ONLY ONE NEW BUTTON -->
+        <a href="#" class="btn bg-gradient-success btn-sm mb-0"
+           data-bs-toggle="modal"
+           data-bs-target="#addInventoryModal">
+            + Add
+        </a>
         <a href="#" class="btn bg-gradient-danger btn-sm mb-0"
            data-bs-toggle="modal"
-           data-bs-target="#createBloodRequestModal">
-            + New
+           data-bs-target="#deductInventoryModal">
+            - Deduct
         </a>
     </div>
 </div>
@@ -84,101 +79,59 @@
                             <table class="table align-items-center mb-0">
                                 <thead>
                                     <tr>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            ID
-                                        </th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                            Requester
+                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            A+
                                         </th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Email
+                                            A-
                                         </th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Location
+                                            B+
                                         </th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Blood Type
+                                            B-
                                         </th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Quantity
+                                            AB+
                                         </th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Urgency Level
+                                            AB-
                                         </th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Request Date
+                                            O+
                                         </th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Status
-                                        </th>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Fulfilled By
-                                        </th>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Action
+                                            O-
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($data as $dat)
                                     <tr>
-                                        <td class="ps-4">
-                                            <p class="text-xs font-weight-bold mb-0">{{$dat->id}}</p>
+                                        <td>
+                                            <p class="text-center text-xs font-weight-bold mb-0">{{$data['A+'] ?? 0}}</p>
                                         </td>
                                         <td>
-                                            <p class="text-xs font-weight-bold mb-0">{{$dat->hospital->name}}</p>
+                                            <p class="text-center text-xs font-weight-bold mb-0">{{$data['A-'] ?? 0}}</p>
                                         </td>
-                                        <td class="text-center">
-                                            <p class="text-xs font-weight-bold mb-0">{{$dat->hospital->user->email}}</p>
+                                        <td>
+                                            <p class="text-center text-xs font-weight-bold mb-0">{{$data['B+'] ?? 0}}</p>
                                         </td>
-                                        <td class="text-center">
-                                            <p class="text-xs font-weight-bold mb-0">{{explode('|', $dat->hospital->location)[0]}}</p>
+                                        <td>
+                                            <p class="text-center text-xs font-weight-bold mb-0">{{$data['B-'] ?? 0}}</p>
                                         </td>
-                                        <td class="text-center">
-                                            <p class="text-xs font-weight-bold mb-0">{{$dat->blood_type}}</p>
+                                        <td>
+                                            <p class="text-center text-xs font-weight-bold mb-0">{{$data['AB+'] ?? 0}}</p>
                                         </td>
-                                        <td class="text-center">
-                                            <p class="text-xs font-weight-bold mb-0">{{$dat->quantity}}</p>
+                                        <td>
+                                            <p class="text-center text-xs font-weight-bold mb-0">{{$data['AB-'] ?? 0}}</p>
                                         </td>
-                                        <td class="text-center">
-                                            <span class="text-secondary text-xs font-weight-bold">{{$dat->urgency_lvl}}</span>
+                                        <td>
+                                            <p class="text-center text-xs font-weight-bold mb-0">{{$data['O+'] ?? 0}}</p>
                                         </td>
-                                        <td class="text-center">
-                                            <span class="text-secondary text-xs font-weight-bold">{{$dat->request_date->format('Y-m-d')}}</span>
-                                        </td>
-                                        <td class="text-center">
-                                            <span class="text-secondary text-xs font-weight-bold">{{$dat->status}}</span>
-                                        </td>
-                                        <td class="text-center">
-                                            <span class="text-secondary text-xs font-weight-bold">{{$dat->confirmedBy ? $dat->confirmedBy->name : null }}</span>
-                                        </td>
-                                        <td class="text-center">
-                                            <a 
-                                                href="#"
-                                                class="mx-3 {{(Auth::user()->id === $dat->hospital->user->id || $dat->status === 'Fulfilled') ? 'disabled' : ''}}"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#fulfillBloodRequestModal"
-                                                data-bs-original-title="Edit user"
-                                                data-id="{{ $dat->id }}"
-                                            >
-                                                <i class="fas fa-user-edit text-secondary"></i>
-                                            </a>
-                                            {{-- <span>
-                                                <a
-                                                    href="#"
-                                                    class="mx-3"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#deleteHospitalModal"
-                                                    data-bs-original-title="Delete user"
-                                                    data-id="{{ $dat->id }}"
-                                                    data-name="{{ $dat->name }}"
-                                                >
-                                                    <i class="cursor-pointer fas fa-trash text-secondary"></i>
-                                                </a>
-                                            </span> --}}
+                                        <td>
+                                            <p class="text-center text-xs font-weight-bold mb-0">{{$data['O-'] ?? 0}}</p>
                                         </td>
                                     </tr>
-                                    @endforeach
                                 </tbody>
                             </table>
                         </div>

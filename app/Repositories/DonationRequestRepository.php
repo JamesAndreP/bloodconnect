@@ -4,9 +4,12 @@ namespace App\Repositories;
 
 use App\Enums\DonationRequestScheduleStatusEnum;
 use App\Enums\DonationRequestStatusEnum;
+use App\Enums\InventoryEnum;
+use App\Enums\InventoryStatusEnum;
 use App\Models\DonationRequest;
 use App\Models\DonationRequestSchedule;
 use App\Models\Hospital;
+use App\Models\Quantity;
 use App\Models\User;
 use App\Repositories\Contracts\DonationRequestRepositoryInterface;
 use Illuminate\Support\Facades\Auth;
@@ -130,6 +133,16 @@ class DonationRequestRepository implements DonationRequestRepositoryInterface
             ->get();
     }
 
+    public function allApprovedByHospital(int $hospital_id)
+    {
+        return DonationRequest::with(['user' => function ($query) {
+            $query->orderBy('id', 'asc');
+        }])
+            ->where('hospital_id', $hospital_id)
+            ->where('status', DonationRequestStatusEnum::Approved)
+            ->get();
+    }
+
     public function find(int $id)
     {
         return DonationRequest::findOrFail($id);
@@ -139,9 +152,9 @@ class DonationRequestRepository implements DonationRequestRepositoryInterface
     {
         $user = Auth::user();
         $latestDonationRequest = DonationRequest::where('user_id', $data['user_id'])
-    ->where('status', DonationRequestStatusEnum::Approved)
-    ->latest()
-    ->first();
+            ->where('status', DonationRequestStatusEnum::Approved)
+            ->latest()
+            ->first();
         if ($latestDonationRequest) {
             if (strtoupper($user->gender) == 'MALE') {
                 $allowDate = $latestDonationRequest->created_at->addMonths(4)->format('M d, Y');
@@ -158,13 +171,13 @@ class DonationRequestRepository implements DonationRequestRepositoryInterface
                     );
                 }
                 $latestPendingRequest = DonationRequest::where('user_id', $data['user_id'])
-    ->where('status', DonationRequestStatusEnum::Pending)
-    ->latest()
-    ->first();
+                    ->where('status', DonationRequestStatusEnum::Pending)
+                    ->latest()
+                    ->first();
 
-if ($latestPendingRequest) {
-    throw new \Exception("You already have a pending donation request.");
-}
+                if ($latestPendingRequest) {
+                    throw new \Exception("You already have a pending donation request.");
+                }
             }
         }
         $donationRequest = DonationRequest::create($data);
@@ -179,24 +192,55 @@ if ($latestPendingRequest) {
     }
 
     public function approve(int $id, array $data)
-{
-    $donationRequest = DonationRequest::findOrFail($id);
-    $donationRequest->update(['status' => DonationRequestStatusEnum::Approved]);
+    {
+        $donationRequest = DonationRequest::findOrFail($id);
+        $donationRequest->update(['status' => DonationRequestStatusEnum::Approved]);
 
-    DonationRequestSchedule::where('donation_request_id', $donationRequest->id)
-        ->update(['status' => DonationRequestScheduleStatusEnum::Inactive]);
+        DonationRequestSchedule::where('donation_request_id', $donationRequest->id)
+            ->update(['status' => DonationRequestScheduleStatusEnum::Inactive]);
 
-    DonationRequestSchedule::create([
-        'donation_request_id' => $donationRequest->id,
-        'date' => $data['date'],
-        'notes' => $data['notes'],
-        'status' => DonationRequestScheduleStatusEnum::Active
-    ]);
+        DonationRequestSchedule::create([
+            'donation_request_id' => $donationRequest->id,
+            'date' => $data['date'],
+            'notes' => $data['notes'],
+            'status' => DonationRequestScheduleStatusEnum::Active
+        ]);
 
-    return DonationRequest::with(['user', 'hospital', 'hospital.user', 'latestActiveSchedule'])
-        ->where('id', $donationRequest->id)
-        ->first();
-}
+        return DonationRequest::with(['user', 'hospital', 'hospital.user', 'latestActiveSchedule'])
+            ->where('id', $donationRequest->id)
+            ->first();
+    }
+
+    public function confirm(int $id)
+    {
+        $donationRequest = DonationRequest::findOrFail($id);
+        $donationRequest->update(['status' => DonationRequestStatusEnum::Confirmed]);
+
+        $latestQuantity = Quantity::where('hospital_id', $donationRequest->hospital_id)
+            ->where('blood_type', $donationRequest->blood_type)
+            ->where('status', InventoryStatusEnum::Active)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($latestQuantity) {
+            $latestQuantity->update(['status' => InventoryStatusEnum::Inactive]);
+        }
+
+        Quantity::create([
+            'hospital_id' => $donationRequest->hospital_id,
+            'donation_request_id' => $donationRequest->id,
+            'quantity' => 1,
+            'previous_quantity' => $latestQuantity ? $latestQuantity->current_quantity : 0,
+            'current_quantity' => ($latestQuantity ? $latestQuantity->current_quantity : 0) + 1,
+            'type' => InventoryEnum::System,
+            'blood_type' => $donationRequest->blood_type,
+            'status' => InventoryStatusEnum::Active
+        ]);
+
+        return DonationRequest::with(['user', 'hospital', 'hospital.user', 'latestActiveSchedule'])
+            ->where('id', $donationRequest->id)
+            ->first();
+    }
 
     public function reschedule(int $id, array $data)
     {

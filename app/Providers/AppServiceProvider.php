@@ -7,9 +7,11 @@ use App\Repositories\Contracts\BloodRequestRepositoryInterface;
 use App\Repositories\Contracts\HospitalRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\Contracts\DonationRequestRepositoryInterface;
+use App\Repositories\Contracts\BloodInventoryRepositoryInterface;
 use App\Repositories\HospitalRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\DonationRequestRepository;
+use App\Repositories\BloodInventoryRepository;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -25,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(HospitalRepositoryInterface::class, HospitalRepository::class);
         $this->app->bind(DonationRequestRepositoryInterface::class, DonationRequestRepository::class);
         $this->app->bind(BloodRequestRepositoryInterface::class, BloodRequestRepository::class);
+        $this->app->bind(BloodInventoryRepositoryInterface::class, BloodInventoryRepository::class);
     }
 
     /**

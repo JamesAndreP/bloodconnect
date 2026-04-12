@@ -7,6 +7,7 @@ use App\Http\Controllers\DonationRequestController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HospitalController;
 use App\Http\Controllers\InfoUserController;
+use App\Http\Controllers\BloodInventoryController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ResetController;
@@ -96,10 +97,12 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/donation-requests/donor', [DonationRequestController::class, 'donor'])->name('donation-requests.donor');
 	Route::get('/donation-requests/hospital', [DonationRequestController::class, 'hospital'])->name('donation-requests.hospital');
 	Route::get('/donation-requests/reschedule', [DonationRequestController::class, 'showReschedule'])->name('donation-requests.reschedule.show');
+	Route::get('/donation-requests/approve', [DonationRequestController::class, 'showConfirm'])->name('donation-requests.confirm.show');
 	Route::get('/donation-requests/{id}', [DonationRequestController::class, 'show'])->name('donation-requests.show');
 	Route::post('/donation-requests', [DonationRequestController::class, 'store'])->name('donation-requests.store');
 	Route::patch('/donation-requests/{id}', [DonationRequestController::class, 'update'])->name('donation-requests.update');
 	Route::patch('/donation-requests/approve/{id}', [DonationRequestController::class, 'approve'])->name('donation-requests.approve');
+	Route::post('/donation-requests/confirm/{id}', [DonationRequestController::class, 'confirm'])->name('donation-requests.confirm');
 	Route::patch('/donation-requests/reschedule/{id}', [DonationRequestController::class, 'reschedule'])->name('donation-requests.reschedule');
 	Route::patch('/donation-requests/reschedule/approve/{id}', [DonationRequestController::class, 'approveReschedule'])->name('donation-requests.reschedule.approve');
 	Route::patch('/donation-requests/reschedule/decline/{id}', [DonationRequestController::class, 'declineReschedule'])->name('donation-requests.reschedule.decline');
@@ -109,6 +112,10 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/blood-requests', [BloodRequestController::class, 'index'])->name('blood-requests.index');
 	Route::post('/blood-requests', [BloodRequestController::class, 'store'])->name('blood-requests.store');
 	Route::patch('/blood-requests/fulfill/{id}', [BloodRequestController::class, 'fulfill'])->name('blood-requests.fulfill');
+
+	Route::get('/blood-inventory', [BloodInventoryController::class, 'index'])->name('blood-inventory.index');
+	Route::post('/blood-inventory', [BloodInventoryController::class, 'store'])->name('blood-inventory.store');
+	Route::post('/blood-inventory/deduct', [BloodInventoryController::class, 'deduct'])->name('blood-inventory.deduct');
 });
 
 

@@ -8,4 +8,5 @@ enum DonationRequestStatusEnum: string
     case RescheduleRequest = 'RescheduleRequest';
     case Approved = 'Approved';
     case Cancelled = 'Cancelled';
+    case Confirmed = 'Confirmed';
 }

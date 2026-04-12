@@ -15,25 +15,25 @@ class BloodRequestController extends Controller
     }
 
     public function index(Request $request)
-{
-    $data = $this->service->getAll();
+    {
+        $data = $this->service->getAll();
 
-    if ($request->sort == 'newest') {
-        $data = collect($data)->sortByDesc(function ($item) {
-            return $item->request_date;
-        })->values();
+        if ($request->sort == 'newest') {
+            $data = collect($data)->sortByDesc(function ($item) {
+                return $item->request_date;
+            })->values();
+        }
+
+        if ($request->sort == 'oldest') {
+            $data = collect($data)->sortBy(function ($item) {
+                return $item->request_date;
+            })->values();
+        }
+
+        return view('blood-requests')->with([
+            "data" => $data
+        ]);
     }
-
-    if ($request->sort == 'oldest') {
-        $data = collect($data)->sortBy(function ($item) {
-            return $item->request_date;
-        })->values();
-    }
-
-    return view('blood-requests')->with([
-        "data" => $data
-    ]);
-}
 
     public function show($id)
     {
@@ -54,8 +54,12 @@ class BloodRequestController extends Controller
 
     public function fulfill($id)
     {
-        $this->service->fulfill($id);
-        return redirect()->back()->with('success', 'Fulfilled Blood Request Successfully!');
+        try {
+            $this->service->fulfill($id);
+            return redirect()->back()->with('success', 'Fulfilled Blood Request Successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function update(Request $request, $id)

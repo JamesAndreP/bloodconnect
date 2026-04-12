@@ -19,7 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->string('role');
-            // $table->string('blood_type')->nullable();
+            $table->string('blood_type')->nullable();
             $table->string('location')->nullable();
             $table->date('birth_date');
             $table->string('gender');

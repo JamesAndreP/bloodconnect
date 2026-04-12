@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('hospital_id');
+            $table->string('blood_type');
             $table->text('notes')->nullable();
             $table->string('status');
             $table->timestamps();

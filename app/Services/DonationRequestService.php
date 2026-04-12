@@ -89,55 +89,83 @@ class DonationRequestService
         return $this->repository->allRescheduleByHospital($hospital->id);
     }
 
+    public function getAllApprovedByHospital()
+    {
+        $user = Auth::user();
+        if (!$user || $user->role->value !== 'hospital') {
+            abort(403, 'Forbidden.');
+        }
+        $hospital = Hospital::where('user_id', $user->id)->first();
+        if (!$hospital) {
+            abort(403, 'Forbidden.');
+        }
+        return $this->repository->allApprovedByHospital($hospital->id);
+    }
+
     public function getById(int $id)
     {
         return $this->repository->find($id);
     }
 
-   public function create($requestData = [])
-{
-    $data = [];
-    $user = Auth::user();
+    public function create($requestData = [])
+    {
+        $data = [];
+        $user = Auth::user();
 
-    $location = explode('|', $user->location);
+        $location = explode('|', $user->location);
 
-    // 👉 If user selected hospital, use it
-    if (isset($requestData['hospital_id']) && $requestData['hospital_id']) {
-        $data['hospital_id'] = $requestData['hospital_id'];
-    } else {
-        // 👉 fallback to nearest hospital (original logic)
-        $nearestHospital = $this->hospitalRepository->findNearestHospital($location[1], $location[2]);
-        $data['hospital_id'] = $nearestHospital->id;
+        // 👉 If user selected hospital, use it
+        if (isset($requestData['hospital_id']) && $requestData['hospital_id']) {
+            $data['hospital_id'] = $requestData['hospital_id'];
+        } else {
+            // 👉 fallback to nearest hospital (original logic)
+            $nearestHospital = $this->hospitalRepository->findNearestHospital($location[1], $location[2]);
+            $data['hospital_id'] = $nearestHospital->id;
+        }
+
+        $data['user_id'] = $user->id;
+        $data['date'] = now();
+        $data['status'] = DonationRequestStatusEnum::Pending;
+        $data['blood_type'] = $user->blood_type;
+
+        $donationRequest = $this->repository->create($data);
+
+        Mail::to($donationRequest->user->email)->queue(new DonationRequestMail($donationRequest));
+        Mail::to($donationRequest->hospital->user->email)->queue(new DonationRequestAdminMail($donationRequest));
+
+        return $donationRequest;
     }
 
-    $data['user_id'] = $user->id;
-    $data['date'] = now();
-    $data['status'] = DonationRequestStatusEnum::Pending;
-
-    $donationRequest = $this->repository->create($data);
-
-    Mail::to($donationRequest->user->email)->queue(new DonationRequestMail($donationRequest));
-    Mail::to($donationRequest->hospital->user->email)->queue(new DonationRequestAdminMail($donationRequest));
-
-    return $donationRequest;
-}
     public function update(int $id, array $data)
     {
         return $this->repository->update($id, $data);
     }
 
     public function approve(int $id, array $data)
-{
-    $donationRequest = $this->repository->approve($id, $data);
+    {
+        $donationRequest = $this->repository->approve($id, $data);
 
-    Mail::to($donationRequest->user->email)
-        ->send(new ApproveRequestMail($donationRequest));
+        Mail::to($donationRequest->user->email)
+            ->send(new ApproveRequestMail($donationRequest));
 
-    Mail::to($donationRequest->hospital->user->email)
-        ->send(new ApproveRequestAdminMail($donationRequest));
+        Mail::to($donationRequest->hospital->user->email)
+            ->send(new ApproveRequestAdminMail($donationRequest));
 
-    return $donationRequest;
-}
+        return $donationRequest;
+    }
+
+    public function confirm(int $id)
+    {
+        $donationRequest = $this->repository->confirm($id);
+
+        // Mail::to($donationRequest->user->email)
+        //     ->send(new ApproveRequestMail($donationRequest));
+
+        // Mail::to($donationRequest->hospital->user->email)
+        //     ->send(new ApproveRequestAdminMail($donationRequest));
+
+        return $donationRequest;
+    }
 
     public function reschedule(int $id, array $data)
     {

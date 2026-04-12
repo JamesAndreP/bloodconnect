@@ -27,6 +27,7 @@ class User extends Authenticatable
         'role',
         'location',
         'birth_date',
+        'blood_type',
         'gender',
         'phone',
         'status',

@@ -45,7 +45,7 @@
         .blood-logout {
             background: rgba(179, 0, 0, 0.88);
             color: #ffffff !important;
-            padding: 0.60rem 1.05rem;
+            padding: 5px 10px !important;
             border-radius: 0.9rem;
             box-shadow: 0 8px 18px rgba(179, 0, 0, 0.18);
             display: inline-flex;

@@ -123,6 +123,24 @@
                 @enderror
               </div>
 
+              <!-- BLOODTYPE -->
+              <div class="mb-3">
+                <select name="blood_type" class="form-control">
+                  <option value="">-- Select Blood Type --</option>
+                  <option value="A+" {{ old('blood_type') == 'A+' ? 'selected' : '' }}>A+</option>
+                  <option value="A-" {{ old('blood_type') == 'A-' ? 'selected' : '' }}>A-</option>
+                  <option value="B+" {{ old('blood_type') == 'B+' ? 'selected' : '' }}>B+</option>
+                  <option value="B-" {{ old('blood_type') == 'B-' ? 'selected' : '' }}>B-</option>
+                  <option value="O+" {{ old('blood_type') == 'O+' ? 'selected' : '' }}>O+</option>
+                  <option value="O-" {{ old('blood_type') == 'O-' ? 'selected' : '' }}>O-</option>
+                  <option value="AB+" {{ old('blood_type') == 'AB+' ? 'selected' : '' }}>AB+</option>
+                  <option value="AB-" {{ old('blood_type') == 'AB-' ? 'selected' : '' }}>AB-</option>
+                </select>
+                @error('blood_type')
+                  <p class="text-danger text-xs">{{ $message }}</p>
+                @enderror
+              </div>
+
               <!-- PHONE -->
               <div class="mb-3">
                 <input type="text"

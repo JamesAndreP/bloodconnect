@@ -25,61 +25,83 @@ class DonationRequestController extends Controller
     }
 
     public function donor(HospitalRepositoryInterface $hospitalRepository)
-{
-    $user = Auth::user();
-    $location = explode('|', $user->location);
+    {
+        $user = Auth::user();
+        $location = explode('|', $user->location);
 
-    $nearbyHospitals = $hospitalRepository->findNearbyHospitals($location[1], $location[2], $location[0]);
+        $nearbyHospitals = $hospitalRepository->findNearbyHospitals($location[1], $location[2], $location[0]);
 
-    return view('donation-requests')->with([
-        "data" => $this->service->getAllByDonor(),
-        "nearbyHospitals" => $nearbyHospitals
-    ]);
-}
+        return view('donation-requests')->with([
+            "data" => $this->service->getAllByDonor(),
+            "nearbyHospitals" => $nearbyHospitals
+        ]);
+    }
 
     public function hospital(Request $request)
-{
-    $data = $this->service->getAllByHospital();
+    {
+        $data = $this->service->getAllByHospital();
 
-    // SORTING (based on Creation Date)
-    if ($request->sort == 'newest') {
-        $data = collect($data)->sortByDesc(function ($item) {
-            return $item->created_at;
-        })->values();
+        // SORTING (based on Creation Date)
+        if ($request->sort == 'newest') {
+            $data = collect($data)->sortByDesc(function ($item) {
+                return $item->created_at;
+            })->values();
+        }
+
+        if ($request->sort == 'oldest') {
+            $data = collect($data)->sortBy(function ($item) {
+                return $item->created_at;
+            })->values();
+        }
+
+        return view('donation-requests-hospital')->with([
+            "data" => $data
+        ]);
     }
 
-    if ($request->sort == 'oldest') {
-        $data = collect($data)->sortBy(function ($item) {
-            return $item->created_at;
-        })->values();
+    public function showReschedule(Request $request)
+    {
+        $data = $this->service->getAllRescheduleByHospital();
+
+        // SORTING BASED ON REQUESTED DATE (RESCHEDULE DATE)
+        if ($request->sort == 'newest') {
+            $data = collect($data)->sortByDesc(function ($item) {
+                return optional($item->latestRescheduleRequest)->date;
+            })->values();
+        }
+
+        if ($request->sort == 'oldest') {
+            $data = collect($data)->sortBy(function ($item) {
+                return optional($item->latestRescheduleRequest)->date;
+            })->values();
+        }
+
+        return view('donation-reschedule-requests')->with([
+            "data" => $data
+        ]);
     }
 
-    return view('donation-requests-hospital')->with([
-        "data" => $data
-    ]);
-}
+    public function showConfirm(Request $request)
+    {
+        $data = $this->service->getAllApprovedByHospital();
 
-   public function showReschedule(Request $request)
-{
-    $data = $this->service->getAllRescheduleByHospital();
+        // SORTING BASED ON REQUESTED DATE (RESCHEDULE DATE)
+        if ($request->sort == 'newest') {
+            $data = collect($data)->sortByDesc(function ($item) {
+                return optional($item->latestRescheduleRequest)->date;
+            })->values();
+        }
 
-    // SORTING BASED ON REQUESTED DATE (RESCHEDULE DATE)
-    if ($request->sort == 'newest') {
-        $data = collect($data)->sortByDesc(function ($item) {
-            return optional($item->latestRescheduleRequest)->date;
-        })->values();
+        if ($request->sort == 'oldest') {
+            $data = collect($data)->sortBy(function ($item) {
+                return optional($item->latestRescheduleRequest)->date;
+            })->values();
+        }
+
+        return view('confirm-donation-requests')->with([
+            "data" => $data
+        ]);
     }
-
-    if ($request->sort == 'oldest') {
-        $data = collect($data)->sortBy(function ($item) {
-            return optional($item->latestRescheduleRequest)->date;
-        })->values();
-    }
-
-    return view('donation-reschedule-requests')->with([
-        "data" => $data
-    ]);
-}
 
     public function show($id)
     {
@@ -90,7 +112,7 @@ class DonationRequestController extends Controller
     public function store(Request $request)
     {
         try {
-           $this->service->create($request->all());
+            $this->service->create($request->all());
             return redirect()->back()->with('success', 'Request Created Successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
@@ -120,6 +142,12 @@ class DonationRequestController extends Controller
 
         $this->service->approve($id, $data);
         return redirect()->back()->with('success', 'Request Approved Successfully!');
+    }
+
+    public function confirm($id)
+    {
+        $this->service->confirm($id);
+        return redirect()->back()->with('success', 'Donation Confirmed Successfully!');
     }
 
     public function reschedule(Request $request, $id)

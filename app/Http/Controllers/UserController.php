@@ -23,7 +23,7 @@ class UserController extends Controller
             'name' => ['required', 'max:50'],
             'email' => ['required', 'email', 'max:50', Rule::unique('users', 'email')],
             'password' => ['required', 'min:5', 'max:20'],
-            // 'blood_type' => ['required'],
+            'blood_type' => ['required'],
             'location' => ['required'],
             'birth_date' => ['required', 'date'],
             'gender' => ['required'],
@@ -51,37 +51,37 @@ class UserController extends Controller
         return view('session.otp');
     }
 
-   public function verifyOtp(Request $request)
-{
-    $request->validate([
-        'email' => ['required', 'email', 'exists:users,email'],
-        'otp'   => ['required', 'digits:6']
-    ]);
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'email', 'exists:users,email'],
+            'otp'   => ['required', 'digits:6']
+        ]);
 
-    $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->first();
 
-    if (!$user) {
-        return back()->withErrors(['email' => 'User not found.']);
+        if (!$user) {
+            return back()->withErrors(['email' => 'User not found.']);
+        }
+
+        // Check if OTP is correct
+        if ($user->otp !== $request->otp) {
+            return back()->withErrors(['otp' => 'Invalid OTP code.'])->withInput();
+        }
+
+        // Check if OTP is expired
+        if ($user->otp_expires_at && now()->greaterThan($user->otp_expires_at)) {
+            return back()->withErrors(['otp' => 'OTP expired. Please request a new one.'])->withInput();
+        }
+
+        // Verify the user
+        $user->email_verified_at = now();
+        $user->otp = null;
+        $user->otp_expires_at = null;
+        $user->save();
+
+        Auth::login($user);
+
+        return redirect('/dashboard')->with('success', 'Your account has been verified.');
     }
-
-    // Check if OTP is correct
-    if ($user->otp !== $request->otp) {
-        return back()->withErrors(['otp' => 'Invalid OTP code.'])->withInput();
-    }
-
-    // Check if OTP is expired
-    if ($user->otp_expires_at && now()->greaterThan($user->otp_expires_at)) {
-        return back()->withErrors(['otp' => 'OTP expired. Please request a new one.'])->withInput();
-    }
-
-    // Verify the user
-    $user->email_verified_at = now();
-    $user->otp = null;
-    $user->otp_expires_at = null;
-    $user->save();
-
-    Auth::login($user);
-
-    return redirect('/dashboard')->with('success', 'Your account has been verified.');
-}
 }

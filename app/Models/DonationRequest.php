@@ -12,6 +12,7 @@ class DonationRequest extends Model
     protected $fillable = [
         'user_id',
         'hospital_id',
+        'blood_type',
         'notes',
         'status',
     ];
