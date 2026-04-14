@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Quantity extends Model
 {
     protected $table = 'quantities';
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
     protected $fillable = [
         'hospital_id',

@@ -57,83 +57,108 @@
                     <x-deduct-inventory />
                     <div class="card-header pb-0">
                         <div class="d-flex flex-row justify-content-between align-items-center">
-    <div>
-        <h5 class="mb-0">Blood Inventory</h5>
-    </div>
+                            <div>
+                                <h5 class="mb-0">Blood Inventory</h5>
+                            </div>
 
-    <div class="d-flex gap-2">
-        <a href="#" class="btn bg-gradient-success btn-sm mb-0"
-           data-bs-toggle="modal"
-           data-bs-target="#addInventoryModal">
-            + Add
-        </a>
-        <a href="#" class="btn bg-gradient-danger btn-sm mb-0"
-           data-bs-toggle="modal"
-           data-bs-target="#deductInventoryModal">
-            - Deduct
-        </a>
-    </div>
-</div>
-                    <div class="card-body px-0 pt-0 pb-2">
-                        <div class="table-responsive p-0">
-                            <table class="table align-items-center mb-0">
-                                <thead>
-                                    <tr>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            A+
-                                        </th>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            A-
-                                        </th>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            B+
-                                        </th>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            B-
-                                        </th>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            AB+
-                                        </th>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            AB-
-                                        </th>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            O+
-                                        </th>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            O-
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <p class="text-center text-xs font-weight-bold mb-0">{{$data['A+'] ?? 0}}</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-center text-xs font-weight-bold mb-0">{{$data['A-'] ?? 0}}</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-center text-xs font-weight-bold mb-0">{{$data['B+'] ?? 0}}</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-center text-xs font-weight-bold mb-0">{{$data['B-'] ?? 0}}</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-center text-xs font-weight-bold mb-0">{{$data['AB+'] ?? 0}}</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-center text-xs font-weight-bold mb-0">{{$data['AB-'] ?? 0}}</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-center text-xs font-weight-bold mb-0">{{$data['O+'] ?? 0}}</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-center text-xs font-weight-bold mb-0">{{$data['O-'] ?? 0}}</p>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <div class="d-flex gap-2">
+                                <a href="#" class="btn bg-gradient-success btn-sm mb-0"
+                                data-bs-toggle="modal"
+                                data-bs-target="#addInventoryModal">
+                                    + Add
+                                </a>
+                                <a href="#" class="btn bg-gradient-danger btn-sm mb-0"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deductInventoryModal">
+                                    - Deduct
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-body px-0 pt-0 pb-2">
+                            <div class="table-responsive p-0">
+                                <table class="table align-items-center mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                A+
+                                            </th>
+                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                A-
+                                            </th>
+                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                B+
+                                            </th>
+                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                B-
+                                            </th>
+                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                AB+
+                                            </th>
+                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                AB-
+                                            </th>
+                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                O+
+                                            </th>
+                                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                O-
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex flex-column align-items-center gap-1">
+                                                    <p class="text-center text-m font-weight-bold mb-0">{{$data['A+'] ?? 0}}</p>
+                                                    <a href="/blood-inventory/A+" class="view-list">View List</a>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-column align-items-center gap-1">
+                                                    <p class="text-center text-m font-weight-bold mb-0">{{$data['A-'] ?? 0}}</p>
+                                                    <a href="/blood-inventory/A-" class="view-list">View List</a>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-column align-items-center gap-1">
+                                                    <p class="text-center text-m font-weight-bold mb-0">{{$data['B+'] ?? 0}}</p>
+                                                    <a href="/blood-inventory/B+" class="view-list">View List</a>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-column align-items-center gap-1">
+                                                    <p class="text-center text-m font-weight-bold mb-0">{{$data['B-'] ?? 0}}</p>
+                                                    <a href="/blood-inventory/B-" class="view-list">View List</a>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-column align-items-center gap-1">
+                                                    <p class="text-center text-m font-weight-bold mb-0">{{$data['AB+'] ?? 0}}</p>
+                                                    <a href="/blood-inventory/AB+" class="view-list">View List</a>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-column align-items-center gap-1">
+                                                    <p class="text-center text-m font-weight-bold mb-0">{{$data['AB-'] ?? 0}}</p>
+                                                    <a href="/blood-inventory/AB-" class="view-list">View List</a>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-column align-items-center gap-1">
+                                                    <p class="text-center text-m font-weight-bold mb-0">{{$data['O+'] ?? 0}}</p>
+                                                    <a href="/blood-inventory/O+" class="view-list">View List</a>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-column align-items-center gap-1">
+                                                    <p class="text-center text-m font-weight-bold mb-0">{{$data['O-'] ?? 0}}</p>
+                                                    <a href="/blood-inventory/O-" class="view-list">View List</a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -164,6 +189,14 @@ a.disabled {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+.view-list {
+    padding: 3px 8px;
+    background-color: #56cc32;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 12px;
 }
 </style>
 @endpush

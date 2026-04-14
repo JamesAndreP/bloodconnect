@@ -116,6 +116,7 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/blood-inventory', [BloodInventoryController::class, 'index'])->name('blood-inventory.index');
 	Route::post('/blood-inventory', [BloodInventoryController::class, 'store'])->name('blood-inventory.store');
 	Route::post('/blood-inventory/deduct', [BloodInventoryController::class, 'deduct'])->name('blood-inventory.deduct');
+	Route::get('/blood-inventory/{type}', [BloodInventoryController::class, 'showPerType'])->name('blood-inventory.type');
 });
 
 

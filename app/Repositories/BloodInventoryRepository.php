@@ -20,7 +20,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 
-
 class BloodInventoryRepository implements BloodInventoryRepositoryInterface
 {
     public function all()
@@ -116,5 +115,24 @@ class BloodInventoryRepository implements BloodInventoryRepositoryInterface
         // foreach ($hospitals as $hos) {
         //     Mail::to($hos->user->email)->queue(new BloodRequestMail($bloodRequest, $hos));
         // }
+    }
+
+    public function showPerType($type)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return [];
+        }
+
+        $hospital = Hospital::where('user_id', $user->id)->first();
+        if (!$hospital) {
+            return [];
+        }
+
+        return Quantity::with(['donationRequest', 'bloodRequest'])
+            ->where('hospital_id', $hospital->id)
+            ->where('blood_type', $type)
+            ->orderBy('id', 'desc')
+            ->get();
     }
 }

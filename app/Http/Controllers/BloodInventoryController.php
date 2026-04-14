@@ -58,4 +58,24 @@ class BloodInventoryController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
+
+    public function showPerType(string $type, Request $request)
+    {
+        $data = $this->service->showPerType($type);
+        if ($request->sort == 'newest') {
+            $data = collect($data)->sortByDesc(function ($item) {
+                return $item->created_at;
+            })->values();
+        }
+
+        if ($request->sort == 'oldest') {
+            $data = collect($data)->sortBy(function ($item) {
+                return $item->created_at;
+            })->values();
+        }
+
+        return view('blood-inventory-per-type')->with([
+            "data" => $data
+        ]);
+    }
 }
